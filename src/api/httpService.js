@@ -1,6 +1,3 @@
-//import axios from 'axios';
-//import qs from 'qs';
-
 export default {
   //ajax请求
   async httpRequest(option = {}) {
@@ -50,5 +47,8 @@ export default {
   //滚动顶部
   async scrollTop() {
     window.scrollTo(0, 0);
+  },
+  async showToast(text) {
+    alert(text);
   }
 }

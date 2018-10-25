@@ -69,35 +69,24 @@
         </div>
         <div class="container Kline_scope">
             <div class="tab_title fb">
-                <div :class="KlineTab==0?'tabselected':'tab'" @click="getKline(0)">分时</div>
-                <div :class="KlineTab==4?'tabselected':'tab'" @click="getKline(4)">五日</div>
-                <div :class="KlineTab==1?'tabselected':'tab'" @click="getKline(1)">日线</div>
-                <div :class="KlineTab==2?'tabselected':'tab'" @click="getKline(2)">周线</div>
-                <div :class="KlineTab==3?'tabselected':'tab'" @click="getKline(3)">月线</div>
+                <div :class="KlineTab==index?'tabselected':'tab'" v-for="(item, index) in KlineTabs" :key="index" @click="getKline(index)">{{item}}</div>
             </div>
             <ec-canvas v-if="canvas&&KlineTab==0" class="canvas" id="mychart-dom-bar" canvas-id="mychart-bar0" :ec="ec"></ec-canvas>
-            <ec-canvas v-if="canvas&&KlineTab==4" class="canvas" id="mychart-dom-bar" canvas-id="mychart-bar1" :ec="ec1"></ec-canvas>
-            <ec-canvas v-if="canvas&&KlineTab==1" class="canvas" id="mychart-dom-bar" canvas-id="mychart-bar2" :ec="ec2"></ec-canvas>
-            <ec-canvas v-if="canvas&&KlineTab==2" class="canvas" id="mychart-dom-bar" canvas-id="mychart-bar3" :ec="ec3"></ec-canvas>
-            <ec-canvas v-if="canvas&&KlineTab==3" class="canvas" id="mychart-dom-bar" canvas-id="mychart-bar4" :ec="ec4"></ec-canvas>
+            <ec-canvas v-if="canvas&&KlineTab==4" class="canvas" id="mychart-dom-bar" canvas-id="mychart-bar1" :ec="ec4"></ec-canvas>
+            <ec-canvas v-if="canvas&&KlineTab==1" class="canvas" id="mychart-dom-bar" canvas-id="mychart-bar2" :ec="ec1"></ec-canvas>
+            <ec-canvas v-if="canvas&&KlineTab==2" class="canvas" id="mychart-dom-bar" canvas-id="mychart-bar3" :ec="ec2"></ec-canvas>
+            <ec-canvas v-if="canvas&&KlineTab==3" class="canvas" id="mychart-dom-bar" canvas-id="mychart-bar4" :ec="ec3"></ec-canvas>
             <div v-show="!canvas&&KlineTab==0" id="timeChart" :style="'width:'+screenWidth+'px;height:'+screenHeigth+'px'"></div>
-            <div v-show="!canvas&&KlineTab==1" id="dailyChart" :style="'width:'+screenWidth+'px;height:'+screenHeigth+'px'"></div>
-            <div v-show="!canvas&&KlineTab==2" id="weekChart" :style="'width:'+screenWidth+'px;height:'+screenHeigth+'px'"></div>
-            <div v-show="!canvas&&KlineTab==3" id="mouthChart" :style="'width:'+screenWidth+'px;height:'+screenHeigth+'px'"></div>
-            <div v-show="!canvas&&KlineTab==4" id="fiveDayChart" :style="'width:'+screenWidth+'px;height:'+screenHeigth+'px'"></div>
+            <div v-show="!canvas&&KlineTab==1" id="fiveDayChart" :style="'width:'+screenWidth+'px;height:'+screenHeigth+'px'"></div>
+            <div v-show="!canvas&&KlineTab==2" id="dailyChart" :style="'width:'+screenWidth+'px;height:'+screenHeigth+'px'"></div>
+            <div v-show="!canvas&&KlineTab==3" id="weekChart" :style="'width:'+screenWidth+'px;height:'+screenHeigth+'px'"></div>
+            <div v-show="!canvas&&KlineTab==4" id="mouthChart" :style="'width:'+screenWidth+'px;height:'+screenHeigth+'px'"></div>
         </div>
-        <!-- <div class="circle" @click="getStockMsg">
-            <div class="circle_txt">相似 K 线</div>
-        </div> -->
         <div class="container news_List">
             <div class="tab_title fb">
-                <div :class="lineNum==0?'tabselected':'tab'" @click="getNews(0)">新闻</div>
-                <div :class="lineNum==4?'tabselected':'tab'" @click="getNews(4)">资金</div>
-                <div :class="lineNum==1?'tabselected':'tab'" @click="getNews(1)">公告</div>
-                <div :class="lineNum==2?'tabselected':'tab'" @click="getNews(2)">研报</div>
-                <div :class="lineNum==3?'tabselected':'tab'" @click="getNews(3)">简况</div>
+                <div :class="lineNum==index?'tabselected':'tab'" v-for="(item, index) in newsTabs" :key="index" @click="getNews(index)">{{item}}</div>
             </div>
-            <div v-if="lineNum==0||lineNum==1||lineNum==2">
+            <div v-if="lineNum==0||lineNum==2||lineNum==3">
                 <div v-if="news && news.length == 0" class="news-none">
                     暂无相关内容
                 </div>
@@ -112,7 +101,7 @@
                     </div>
                 </div>
             </div>
-            <div v-if="lineNum==3">
+            <div v-if="lineNum==4">
                 <div class="stockSummary_li">
                     <span>公司名称</span>
                     <span class="stockSummary_span">{{stockSummary.name}}</span>
@@ -134,7 +123,7 @@
                     <span class="stockSummary_span">100</span>
                 </div>
             </div>
-            <div v-if="lineNum==4">
+            <div v-if="lineNum==1">
                 <fundCharts></fundCharts>
             </div>
         </div>
@@ -145,7 +134,6 @@ import Kline from '../../services/KlineService'
 import parserDate from '../../utils/echarts-dateKline'
 import store from '../../vuex/store'
 import fundCharts from '../../components/fundCharts'
-import echarts from 'echarts'
 import Util from '../../utils/util'
 import timeDate from '../../utils/echarts-timeKline'
 
@@ -193,7 +181,9 @@ export default {
             stockSummary: {},
             stockNews: [],
             stockNotices: [],
-            stockResearch: []
+            stockResearch: [],
+            KlineTabs: ['分时', '五日', '日线', '周线', '月线'],
+            newsTabs: ['新闻', '资金', '公告', '研报', '简况']
         }
     },
     components: {
@@ -293,11 +283,11 @@ export default {
                     this.news = this.stockNews;
                     this.newsTitle = '70%';
                     break;
-                case 1:
+                case 2:
                     this.news = this.stockNotices;
                     this.newsTitle = 'auto';
                     break;
-                case 2:
+                case 3:
                     this.news = this.stockResearch;
                     this.newsTitle = 'auto';
                     break;
@@ -326,166 +316,7 @@ export default {
 }
 </script>
 <style>
-.Kline_scope {
-  z-index: 1;
-}
-.font_red {
-  color: red;
-}
-.font_green {
-  color: green;
-}
-.font_gray {
-  color: #666;
-}
-.fb_5 {
-  font-weight: 500;
-}
-.stock_msg {
-  text-align: center;
-}
-ec-canvas {
-  width: 400px;
-  height: 240px;
-}
-.news_List {
-  position: relative;
-}
-.container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 0;
-  box-sizing: border-box;
-  -webkit-user-select: none;
-  user-select: none;
-  width: 100%;
-  overflow-x: hidden;
-  /* font-size: 60px; */
-}
-.flex-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: end;
-}
-.flex-column {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: stretch;
-}
-.flex-cell {
-  flex: 1;
-}
-.item {
-  margin: 2px;
-}
-.tab_title {
-  text-align: center;
-  width: auto;
-  border-bottom: 1px solid #999;
-  padding: 5px;
-  margin-bottom: 10px;
-  border-top: 1px solid #999;
-  font-family: cursive;
-}
-.tab {
-  display: inline;
-  margin: 10px 15px;
-}
-.tabselected {
-  display: inline;
-  margin: 10px 15px;
-  color: red;
-}
-.list {
-  padding: 0;
-}
-.list-item {
-  height: 70px;
-  margin: 0 15px;
-  border-bottom: 1px solid #f5f5f5;
-  width: 90%;
-  padding-bottom: 10px;
-}
-.item-title {
-  display: inline-block;
-  padding-top: 15px;
-  line-height: 20px;
-}
-.image-wrapper {
-  float: right;
-  padding-top: 15px;
-}
-.item-image {
-  width: 75px;
-  height: 60px;
-}
-.multipic {
-  display: block;
-  position: absolute;
-  right: 0;
-  bottom: 2px;
-  width: 40px;
-  height: 16px;
-  font-size: 12px;
-  color: #fff;
-  background: #000;
-  opacity: 0.7;
-  text-align: center;
-  line-height: 16px;
-}
-.news-none {
-  text-align: center;
-  padding: 30px;
-}
-.stock_info {
-  font-size: 14px;
-}
-.stock_nMatch {
-  font-size: 35px;
-}
-.stock_name {
-  font-size: 18px;
-  font-weight: bold;
-  position: relative;
-  top: -8px;
-  left: 22px;
-}
-.stock_detail {
-  width: 100%;
-  text-align: center;
-}
-.stockSummary_li {
-  float: left;
-  display: block;
-  width: 100%;
-  padding: 20px;
-}
-.stockSummary_span {
-  margin-left: 20px;
-}
-.circle {
-  border-radius: 50%;
-  width: 45px;
-  height: 45px;
-  background: #ffb6c1;
-  /* 宽度和高度需要相等 */
-  position: relative;
-  top: -225px;
-  right: -285px;
-}
-.circle_txt {
-  color: red;
-  width: 30px;
-  position: relative;
-  left: 11px;
-  top: 5px;
-  font-size: 12px;
-}
+@import "../../scss/chatDetail.scss";
 </style>
 
 
